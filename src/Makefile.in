@@ -1,0 +1,38 @@
+VPATH = @srcdir@
+
+PREFIX = /usr/local
+AR = ar
+RANLIB = ranlib
+
+ifeq ($(strip $(CC)),dos-gcc)
+PREFIX = /mnt/physics2/usr/labs
+AR = dos-ar
+RANLIB = dos-ranlib
+endif
+
+TARGETS = libdie.a
+
+default : ${TARGETS}
+
+install : install-lib install-h
+
+install-lib : libdie.a
+	-install -m 0755 -d ${PREFIX}/lib
+	install -m 0644 $< ${PREFIX}/lib
+
+install-h : die.h
+	-install -m 0755 -d ${PREFIX}/include
+	install -m 0644 $< ${PREFIX}/include
+
+libdie.a : die.o
+	${AR} r $@ $^
+	${RANLIB} $@
+
+die.o : die.c
+	${CC} ${CFLAGS} -c $<
+
+clean :
+	-rm ${TARGETS} die.o core
+
+dist : ${TARGETS}
+	tar zcvf /home/ftp/pub/Die/die.tar.gz Makefile die.[ch]
